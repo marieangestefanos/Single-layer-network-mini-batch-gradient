@@ -27,6 +27,18 @@ def prePreprocessing(X, mean, std):
     return (X - mean)/std
 
 
+def softmax(x):
+    """ Standard definition of the softmax function """
+    return np.exp(x) / np.sum(np.exp(x), axis=0)
+
+
+def EvaluateClassifier(X, W, b):
+    # _, n = X.shape
+    # K, _ = W.shape
+    # P = np.zeros((K, n))
+
+    return softmax(W @ X + b)
+
 ## Step 1: Read and store train, valid and test datasets
 X_train, Y_train, y_train = LoadBatch(file_train)
 X_valid, Y_valid, y_valid = LoadBatch(file_valid)
@@ -40,7 +52,7 @@ X_train = prePreprocessing(X_train, mean, std)
 X_valid = prePreprocessing(X_valid, mean, std)
 X_test = prePreprocessing(X_test, mean, std)
 
-## Step3: Initialize weights
+## Step 3: Initialize weights
 d, n = np.shape(X_train)
 K, _ = np.shape(Y_train)
 
@@ -48,5 +60,8 @@ rng = np.random.default_rng()
 
 W = rng.normal(0, 0.01, (K, d))
 b = rng.normal(0, 0.01, (K, 1))
+
+##Step 4: Evaluate the network function
+P = EvaluateClassifier(X_train[:, :100], W, b)
 
 debug = 0
