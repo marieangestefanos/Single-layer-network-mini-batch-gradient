@@ -24,4 +24,5 @@ def LoadBatch(filename):
 dict = LoadBatch(file_train)
 
 print("Everything's fine.")
+print("Testing github with vscode")
 debug = 0
