@@ -43,6 +43,13 @@ def ComputeCost(X, Y, W, b, lbda):
     return J
 
 
+def ComputeAccuracy(X, y, W, b):
+    n = len(y)
+    P = EvaluateClassifier(X, W, b)
+    prediction = np.argmax(P, axis=0)
+    acc = np.sum([np.where(prediction[i] == y[i], 1, 0) for i in range(n)])/n
+    return acc
+
 ## Step 1: Read and store train, valid and test datasets
 X_train, Y_train, y_train = LoadBatch(file_train)
 X_valid, Y_valid, y_valid = LoadBatch(file_valid)
@@ -71,5 +78,8 @@ P = EvaluateClassifier(X_train, W, b)
 ## Step 5: Compute the cost function
 lbda = 0
 J = ComputeCost(X_train, Y_train, W, b, lbda)
+
+## Step 6: Compute accuracy of network's prediction
+acc = ComputeAccuracy(X_train, y_train, W, b)
 
 debug = 0
