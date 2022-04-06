@@ -33,11 +33,15 @@ def softmax(x):
 
 
 def EvaluateClassifier(X, W, b):
-    # _, n = X.shape
-    # K, _ = W.shape
-    # P = np.zeros((K, n))
-
     return softmax(W @ X + b)
+
+
+def ComputeCost(X, Y, W, b, lbda):
+    _, n = Y.shape
+    lcross = np.array([Y[:, i].T @ np.log(P[:, i]) for i in range(n)])
+    J = np.sum(lcross)/n + lbda * W * W
+    return J
+
 
 ## Step 1: Read and store train, valid and test datasets
 X_train, Y_train, y_train = LoadBatch(file_train)
@@ -61,7 +65,11 @@ rng = np.random.default_rng()
 W = rng.normal(0, 0.01, (K, d))
 b = rng.normal(0, 0.01, (K, 1))
 
-##Step 4: Evaluate the network function
-P = EvaluateClassifier(X_train[:, :100], W, b)
+## Step 4: Evaluate the network function
+P = EvaluateClassifier(X_train, W, b)
+
+## Step 5: Compute the cost function
+lbda = 0
+J = ComputeCost(X_train, Y_train, W, b, lbda)
 
 debug = 0
