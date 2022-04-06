@@ -40,4 +40,13 @@ X_train = prePreprocessing(X_train, mean, std)
 X_valid = prePreprocessing(X_valid, mean, std)
 X_test = prePreprocessing(X_test, mean, std)
 
+## Step3: Initialize weights
+d, n = np.shape(X_train)
+K, _ = np.shape(Y_train)
+
+rng = np.random.default_rng()
+
+W = rng.normal(0, 0.01, (K, d))
+b = rng.normal(0, 0.01, (K, 1))
+
 debug = 0
