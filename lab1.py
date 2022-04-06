@@ -10,8 +10,8 @@ def LoadBatch(filename):
     with open(filename, 'rb') as fo:
         dict = pickle.load(fo, encoding='bytes')
     
-    X = dict[b'data'].T
-    y = dict[b'labels']
+    X = dict[b'data'].T #size d*n = 3072 * 10000
+    y = dict[b'labels'] #size K*n = 10 * 10000
 
     _, n = X.shape
     K = 10
@@ -22,9 +22,22 @@ def LoadBatch(filename):
 
     return X, Y, y
 
+
+def prePreprocessing(X, mean, std):
+    return (X - mean)/std
+
+
 ## Step 1: Read and store train, valid and test datasets
 X_train, Y_train, y_train = LoadBatch(file_train)
 X_valid, Y_valid, y_valid = LoadBatch(file_valid)
 X_test, Y_test, y_test = LoadBatch(file_test)
+
+## Step 2: Preprocessing train, valid and test sets
+mean = np.mean(X_train, axis = 1).reshape(-1, 1)
+std = np.std(X_train, axis = 1).reshape(-1, 1)
+
+X_train = prePreprocessing(X_train, mean, std)
+X_valid = prePreprocessing(X_valid, mean, std)
+X_test = prePreprocessing(X_test, mean, std)
 
 debug = 0
