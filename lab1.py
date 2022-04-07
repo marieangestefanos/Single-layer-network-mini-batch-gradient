@@ -133,12 +133,14 @@ def ComputeRelativeError(grad_W_an, grad_b_an, grad_W_num, grad_b_num, eps):
     return grad_W_err, grad_b_err
 
 
-def MiniBatchGD(X, Y, GDparams, W, b, lbda):
-    _, n = X.shape
+def MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda):
+    _, n = X_train.shape
     n_batch = GDparams["n_batch"]
     eta = GDparams["eta"]
-    J_list = []
-    loss_list = []
+    J_list_train = []
+    loss_list_train = []
+    J_list_valid = []
+    loss_list_valid = []
 
     for i in range(GDparams["n_epochs"]):
         idx_permutation = rng.permutation(n)
@@ -147,8 +149,8 @@ def MiniBatchGD(X, Y, GDparams, W, b, lbda):
         for i in range(len(j_start_array)):
             j_start = j_start_array[i]
             j_end = j_end_array[i]
-            X_batch = X[:, idx_permutation[j_start:j_end+1]]
-            Y_batch = Y[:, idx_permutation[j_start:j_end+1]]
+            X_batch = X_train[:, idx_permutation[j_start:j_end+1]]
+            Y_batch = Y_train[:, idx_permutation[j_start:j_end+1]]
 
             P_batch = EvaluateClassifier(X_batch, W, b)
 
@@ -159,13 +161,17 @@ def MiniBatchGD(X, Y, GDparams, W, b, lbda):
             #update b
             b -= eta * grad_b
 
-        J, loss = ComputeCost(X, Y, W, b, lbda)
-        J_list.append(J)
-        loss_list.append(loss)
+        J_train, loss_train = ComputeCost(X_train, Y_train, W, b, lbda)
+        J_valid, loss_valid = ComputeCost(X_valid, Y_valid, W, b, lbda)
+
+        J_list_train.append(J_train)
+        loss_list_train.append(loss_train)
+        J_list_valid.append(J_valid)
+        loss_list_valid.append(loss_valid)
 
     Wstar = W
     bstar = b
-    return Wstar, bstar, J_list, loss_list
+    return Wstar, bstar, J_list_train, loss_list_train, J_list_valid, loss_list_valid
 
 
 def plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label):
@@ -175,24 +181,24 @@ def plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label):
     plt.title(title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-    # plt.legend(legends)
 
     for i in range(len(x_axis)):
-        plt.plot(x_axis[i], y_axis[i])
+        plt.plot(x_axis[i], y_axis[i], label=legends[i])
     
+    plt.legend()
     plt.show()
 
 
   ## SCRIPT
 
 ## Parameters
-lbda = 10
+lbda = 0
 end_batch = 5
 d_batch = 20
 h = 1e-6
 eps = 1e-6
 eta = 0.001
-n_epochs = 20
+n_epochs = 40
 n_batch = 100
 GDparams = {"n_batch": n_batch, "eta": eta, "n_epochs": n_epochs}
 
@@ -279,13 +285,20 @@ for j in range(n/n_batch):
     Y_batch = Y_train[:, j_start:j_end]
 """
 
-Wstar, bstar, J_list, loss_list = MiniBatchGD(X_train, Y_train, GDparams, W, b, lbda)
+Wstar, bstar, J_list_train, loss_list_train, J_list_valid, loss_list_valid = \
+    MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda)
+
+acc_train = ComputeAccuracy(X_train, y_train, W, b)
+acc_valid = ComputeAccuracy(X_valid, y_valid, W, b)
+
+print(f"\nAccuracy of the training set: {acc_train*100}%")
+print(f"Accuracy of the validation set: {acc_valid*100}%\n")
 
     # Plot cost after each epoch
-x_axis = np.array([np.arange(0, n_epochs)])
-y_axis = np.array([J_list])
+x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
+y_axis = np.array([J_list_train, J_list_valid])
 x_ticks = np.arange(0, n_epochs, 5)
-legends = ["training"]
+legends = ["training", "validation"]
 x_label = "epoch"
 y_label = "cost function J"
 title = "Cost after every epoch"
@@ -293,10 +306,10 @@ title = "Cost after every epoch"
 plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label)
 
     # Plot loss after each epoch
-x_axis = np.array([np.arange(0, n_epochs)])
-y_axis = np.array([loss_list])
+x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
+y_axis = np.array([loss_list_train, loss_list_valid])
 x_ticks = np.arange(0, n_epochs, 5)
-legends = ["training"]
+legends = ["training", "validation"]
 x_label = "epoch"
 y_label = "loss"
 title = "Loss after every epoch"
