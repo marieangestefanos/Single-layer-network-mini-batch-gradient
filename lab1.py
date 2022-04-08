@@ -8,6 +8,7 @@ file_train = "./Dataset/data_batch_1"
 file_valid = "./Dataset/data_batch_2"
 file_test = "./Dataset/test_batch"
 
+
 def LoadBatch(filename):
     """ Copied from the dataset website """
     import pickle
@@ -45,6 +46,7 @@ def montage(W, title, save_title):
         plt.savefig("./Result_Pics/"+save_title, format="jpg")
     else:
         plt.show()
+    plt.close(fig)
 
 
 def prePreprocessing(X, mean, std):
@@ -195,7 +197,8 @@ def MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda):
 
 
 def plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title):
-    ax = plt.figure().gca()
+    fig = plt.figure()
+    ax = fig.gca()
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     plt.xticks(x_ticks)
     plt.title(title)
@@ -210,7 +213,7 @@ def plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title):
         plt.savefig("./Result_Pics/"+save_title, format="jpg")
     else:
         plt.show()
-
+    plt.close(fig)
 
 
 def script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario):
@@ -264,6 +267,7 @@ def script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario):
     plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
     
 
+
   ## SCRIPT
 
 ## Parameters
@@ -292,6 +296,11 @@ std = np.std(X_train, axis = 1).reshape(-1, 1)
 X_train = prePreprocessing(X_train, mean, std)
 X_valid = prePreprocessing(X_valid, mean, std)
 X_test = prePreprocessing(X_test, mean, std)
+
+montage(X_train.T, "Training set", "trainset")
+montage(X_valid.T, "Validation set", "validset")
+montage(X_test.T, "Test set", "testset")
+
 
 ## Step 3: Initialize weights
 
@@ -447,7 +456,6 @@ GDparams["n_batch"] = 100
 GDparams["eta"] = 0.001
 
 script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario)
-
 
 
 debug = 0
