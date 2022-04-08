@@ -155,6 +155,15 @@ def ComputeRelativeError(grad_W_an, grad_b_an, grad_W_num, grad_b_num, eps):
     return grad_W_err, grad_b_err
 
 
+def CumulatedDifferences(list, plateau_size):
+    old_diff = 0
+    new_diff = 0
+    for i in range(1, plateau_size+1):
+        new_diff += np.abs( list[-i] - list[-i-1] )
+        old_diff += np.abs( list[-i-plateau_size-2] - list[-i-plateau_size-1] )
+    return old_diff, new_diff
+
+
 def MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda):
     _, n = X_train.shape
     n_batch = GDparams["n_batch"]
@@ -163,8 +172,9 @@ def MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda):
     loss_list_train = []
     J_list_valid = []
     loss_list_valid = []
+    plateau_size = 3 #tuning eta
 
-    for i in range(GDparams["n_epochs"]):
+    for epoch in range(GDparams["n_epochs"]):
         idx_permutation = rng.permutation(n)
         j_start_array = np.arange(0, n-n_batch+1, n_batch)
         j_end_array = np.arange(n_batch-1, n, n_batch)
@@ -190,6 +200,20 @@ def MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda):
         loss_list_train.append(loss_train)
         J_list_valid.append(J_valid)
         loss_list_valid.append(loss_valid)
+
+        ## Method1 : linear evolution
+        # eta = GDparams["eta"] - epoch * ((GDparams["eta"] - 1e-6) / n_epochs)
+        
+        ## Method2: systematically reducing eta
+        # if epoch%5 == 0:
+        #     eta = 0.5*eta
+
+        ## Method3: reduce eta when plateau
+        if epoch > 2 * plateau_size:
+            old_diff, new_diff = CumulatedDifferences(J_list_valid, plateau_size)
+            if ( new_diff < old_diff / 10 ):
+                eta = 0.2*eta
+        # print(eta)
 
     Wstar = W
     bstar = b
@@ -217,6 +241,10 @@ def plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title):
 
 
 def script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario):
+    n_epochs = GDparams["n_epochs"]
+    n_batch = GDparams["n_batch"]
+    eta = GDparams["eta"]
+
         # Initialize weights
     W = rng.normal(0, 0.01, (K, d))
     b = rng.normal(0, 0.01, (K, 1))
@@ -234,37 +262,37 @@ def script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario):
     print(f"SCENARIO {scenario}:\n")
     print(f"Accuracy of the training set:\t {round(acc_train*100, 2)}%")
     print(f"Accuracy of the validation set:\t {round(acc_valid*100, 2)}%")
-    print(f"Accuracy of the validation set:\t {round(acc_test*100, 2)}%\n")
+    print(f"Accuracy of the test set:\t {round(acc_test*100, 2)}%\n")
 
-    #     # Plot learnt weight matrix
-    # title = "Learnt weight matrix Wstar as class template images"
-    # save_title = f"SCEN{scenario} - Wstar, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
-    # montage(Wstar, title, save_title)
+        # Plot learnt weight matrix
+    title = "Learnt weight matrix Wstar as class template images"
+    save_title = f"SCEN{scenario} - Wstar, lbda={lbda}, n_epochs={n_epochs}, n_batch={n_batch}, eta={eta}"
+    montage(Wstar, title, save_title)
 
 
-    #     # Plot cost after each epoch
-    # x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
-    # y_axis = np.array([J_list_train, J_list_valid])
-    # x_ticks = np.arange(0, n_epochs+1, 5)
-    # legends = ["training", "validation"]
-    # x_label = "epoch"
-    # y_label = "cost function J"
-    # title = "Cost after every epoch"
-    # save_title = f"SCEN{scenario} - J, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
+        # Plot cost after each epoch
+    x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
+    y_axis = np.array([J_list_train, J_list_valid])
+    x_ticks = np.arange(0, n_epochs+1, 10)
+    legends = ["training", "validation"]
+    x_label = "epoch"
+    y_label = "cost function J"
+    title = "Cost after every epoch"
+    save_title = f"SCEN{scenario} - J, lbda={lbda}, n_epochs={n_epochs}, n_batch={n_batch}, eta={eta}"
 
-    # plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
+    plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
 
-    #     # Plot loss after each epoch
-    # x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
-    # y_axis = np.array([loss_list_train, loss_list_valid])
-    # x_ticks = np.arange(0, n_epochs+1, 5)
-    # legends = ["training", "validation"]
-    # x_label = "epoch"
-    # y_label = "loss"
-    # title = "Loss after every epoch"
-    # save_title = f"SCEN{scenario} - Loss, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
+        # Plot loss after each epoch
+    x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
+    y_axis = np.array([loss_list_train, loss_list_valid])
+    x_ticks = np.arange(0, n_epochs+1, 10)
+    legends = ["training", "validation"]
+    x_label = "epoch"
+    y_label = "loss"
+    title = "Loss after every epoch"
+    save_title = f"SCEN{scenario} - Loss, lbda={lbda}, n_epochs={n_epochs}, n_batch={n_batch}, eta={eta}"
 
-    # plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
+    plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
     
 
 
@@ -380,7 +408,7 @@ acc_test = ComputeAccuracy(X_test, y_test, Wstar, bstar)
 
 print(f"\nAccuracy of the training set:\t {round(acc_train*100, 2)}%")
 print(f"Accuracy of the validation set:\t {round(acc_valid*100, 2)}%")
-print(f"Accuracy of the validation set:\t {round(acc_test*100, 2)}%\n")
+print(f"Accuracy of the test set:\t {round(acc_test*100, 2)}%\n")
 
     # Plot learnt weight matrix
 title = "Learnt weight matrix Wstar as class template images"
@@ -469,5 +497,15 @@ script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario)
 
 
 ## Exercice 2.1 Improve performance of the network
+    
+    # Settings parameters
+scenario = -1
+lbda = 1
+GDparams["n_epochs"] = 80
+GDparams["n_batch"] = 100
+GDparams["eta"] = 0.006
+
+print(lbda, GDparams["n_epochs"], GDparams["n_batch"], GDparams["eta"])
+script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario)
 
 debug = 0
