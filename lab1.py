@@ -268,7 +268,7 @@ def script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario):
     
 
 
-  ## SCRIPT
+  ## Exercice 1
 
 ## Parameters
 lbda = 0
@@ -280,6 +280,7 @@ eta = 0.001
 n_epochs = 40
 n_batch = 100
 GDparams = {"n_batch": n_batch, "eta": eta, "n_epochs": n_epochs}
+rng = np.random.default_rng(400)
 
 ## Step 1: Read and store train, valid and test datasets
 X_train, Y_train, y_train = LoadBatch(file_train)
@@ -297,14 +298,17 @@ X_train = prePreprocessing(X_train, mean, std)
 X_valid = prePreprocessing(X_valid, mean, std)
 X_test = prePreprocessing(X_test, mean, std)
 
+# Display train, validation and test sets
+"""
 montage(X_train.T, "Training set", "trainset")
 montage(X_valid.T, "Validation set", "validset")
 montage(X_test.T, "Test set", "testset")
+"""
 
-
+# Exercise 1: step by step (3 to 7)
+"""
 ## Step 3: Initialize weights
 
-rng = np.random.default_rng(400)
 
 W = rng.normal(0, 0.01, (K, d))
 b = rng.normal(0, 0.01, (K, 1))
@@ -357,10 +361,13 @@ try:
     msg = np.testing.assert_array_almost_equal(grad_b_num_slow, grad_b_an, -np.log10(eps))
 except:
     print("grad_b is incorrect.")
-
+"""
 
 ## Step 8: mini-batch gradient descent algorithm
 
+    # TESTING SCRIPT with given parameters (on fig3)
+
+"""
     # Learning function
 Wstar, bstar, J_list_train, loss_list_train, J_list_valid, loss_list_valid = \
     MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda)
@@ -404,7 +411,10 @@ title = "Loss after every epoch"
 save_title = f"Loss, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
 
 plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
+"""
 
+    # 4 scenarii (ex 1)
+"""
 ### SCENARIO 1
 
     # Settings parameters
@@ -455,6 +465,9 @@ GDparams["n_batch"] = 100
 GDparams["eta"] = 0.001
 
 script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario)
+"""
 
+
+## Exercice 2.1 Improve performance of the network
 
 debug = 0
