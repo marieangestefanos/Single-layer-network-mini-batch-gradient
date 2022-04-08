@@ -501,7 +501,7 @@ script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario)
     # Settings parameters
 scenario = -1
 lbda = 1
-GDparams["n_epochs"] = 80
+GDparams["n_epochs"] = 40
 GDparams["n_batch"] = 100
 GDparams["eta"] = 0.006
 
