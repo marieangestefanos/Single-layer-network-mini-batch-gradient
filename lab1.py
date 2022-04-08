@@ -27,6 +27,26 @@ def LoadBatch(filename):
     return X, Y, y
 
 
+def montage(W, title, save_title):
+    """ Display the image for each label in W """
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(2,5)
+    if title != None:
+        fig.suptitle(title, fontsize=14)
+    for i in range(2):
+        for j in range(5):
+            im  = W[i*5+j,:].reshape(32,32,3, order='F')
+            sim = (im-np.min(im[:]))/(np.max(im[:])-np.min(im[:]))
+            sim = sim.transpose(1,0,2)
+            ax[i][j].imshow(sim, interpolation='nearest')
+            ax[i][j].set_title("y="+str(5*i+j))
+            ax[i][j].axis('off')
+    if save_title != None:
+        plt.savefig("./Result_Pics/"+save_title, format="jpg")
+    else:
+        plt.show()
+
+
 def prePreprocessing(X, mean, std):
     return (X - mean)/std
 
@@ -174,7 +194,7 @@ def MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda):
     return Wstar, bstar, J_list_train, loss_list_train, J_list_valid, loss_list_valid
 
 
-def plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label):
+def plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title):
     ax = plt.figure().gca()
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     plt.xticks(x_ticks)
@@ -186,7 +206,10 @@ def plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label):
         plt.plot(x_axis[i], y_axis[i], label=legends[i])
     
     plt.legend()
-    plt.show()
+    if save_title != None:
+        plt.savefig("./Result_Pics/"+save_title, format="jpg")
+    else:
+        plt.show()
 
 
   ## SCRIPT
@@ -277,22 +300,25 @@ except:
 
 ## Step 8: mini-batch gradient descent algorithm
 
-"""
-for j in range(n/n_batch):
-    j_start = j * n_batch #MATLAB: goes from 1 to n-n_batch+1
-    j_end = j * (n_batch) - 1 #MATLAB: goes from n_batch to n
-    X_batch = X_train[:, j_start:j_end]
-    Y_batch = Y_train[:, j_start:j_end]
-"""
-
+    # Learning function
 Wstar, bstar, J_list_train, loss_list_train, J_list_valid, loss_list_valid = \
     MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda)
 
-acc_train = ComputeAccuracy(X_train, y_train, W, b)
-acc_valid = ComputeAccuracy(X_valid, y_valid, W, b)
+
+    # Accuracies of all datasets
+acc_train = ComputeAccuracy(X_train, y_train, Wstar, bstar)
+acc_valid = ComputeAccuracy(X_valid, y_valid, Wstar, bstar)
+acc_test = ComputeAccuracy(X_test, y_test, Wstar, bstar)
 
 print(f"\nAccuracy of the training set: {acc_train*100}%")
-print(f"Accuracy of the validation set: {acc_valid*100}%\n")
+print(f"Accuracy of the validation set: {acc_valid*100}%")
+print(f"Accuracy of the validation set: {acc_test*100}%\n")
+
+    # Plot learnt weight matrix
+title = "Learnt weight matrix Wstar as class template images"
+save_title = f"Wstar, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
+montage(Wstar, title, save_title)
+
 
     # Plot cost after each epoch
 x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
@@ -302,8 +328,9 @@ legends = ["training", "validation"]
 x_label = "epoch"
 y_label = "cost function J"
 title = "Cost after every epoch"
+save_title = f"J, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
 
-plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label)
+plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
 
     # Plot loss after each epoch
 x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
@@ -313,8 +340,35 @@ legends = ["training", "validation"]
 x_label = "epoch"
 y_label = "loss"
 title = "Loss after every epoch"
+save_title = f"Loss, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
 
-plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label)
+plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
 
+# SCENARIO 1
+lbda = 0
+GDparams["n_epochs"] = 40
+GDparams["n_batch"] = 100
+GDparams["eta"] = 0.1
+
+
+# SCENARIO 2
+lbda = 0
+GDparams["n_epochs"] = 40
+GDparams["n_batch"] = 100
+GDparams["eta"] = 0.001
+
+
+# SCENARIO 3
+lbda = 0.1
+GDparams["n_epochs"] = 40
+GDparams["n_batch"] = 100
+GDparams["eta"] = 0.001
+
+
+# SCENARIO 4
+lbda = 1
+GDparams["n_epochs"] = 40
+GDparams["n_batch"] = 100
+GDparams["eta"] = 0.001
 
 debug = 0
