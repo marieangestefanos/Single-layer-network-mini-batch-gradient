@@ -43,7 +43,7 @@ def montage(W, title, save_title):
             ax[i][j].set_title("y="+str(5*i+j))
             ax[i][j].axis('off')
     if save_title != None:
-        plt.savefig("./Result_Pics/"+save_title, format="jpg")
+        plt.savefig("./Result_Pics/"+save_title+".jpg")
     else:
         plt.show()
     plt.close(fig)
@@ -213,7 +213,7 @@ def MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda):
             old_diff, new_diff = CumulatedDifferences(J_list_valid, plateau_size)
             if ( new_diff < old_diff / 10 ):
                 eta = 0.2*eta
-        # print(eta)
+
 
     Wstar = W
     bstar = b
@@ -234,7 +234,7 @@ def plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title):
     
     plt.legend()
     if save_title != None:
-        plt.savefig("./Result_Pics/"+save_title, format="jpg")
+        plt.savefig("./Result_Pics/"+save_title+".jpg")
     else:
         plt.show()
     plt.close(fig)
