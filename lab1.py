@@ -212,6 +212,58 @@ def plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title):
         plt.show()
 
 
+
+def script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario):
+        # Initialize weights
+    W = rng.normal(0, 0.01, (K, d))
+    b = rng.normal(0, 0.01, (K, 1))
+
+        # Learning function
+    Wstar, bstar, J_list_train, loss_list_train, J_list_valid, loss_list_valid = \
+        MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda)
+
+
+        # Accuracies of each dataset
+    acc_train = ComputeAccuracy(X_train, y_train, Wstar, bstar)
+    acc_valid = ComputeAccuracy(X_valid, y_valid, Wstar, bstar)
+    acc_test = ComputeAccuracy(X_test, y_test, Wstar, bstar)
+
+    print(f"SCENARIO {scenario}:\n")
+    print(f"Accuracy of the training set: {acc_train*100}%")
+    print(f"Accuracy of the validation set: {acc_valid*100}%")
+    print(f"Accuracy of the validation set: {acc_test*100}%\n")
+
+        # Plot learnt weight matrix
+    title = "Learnt weight matrix Wstar as class template images"
+    save_title = f"SCEN{scenario} - Wstar, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
+    montage(Wstar, title, save_title)
+
+
+        # Plot cost after each epoch
+    x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
+    y_axis = np.array([J_list_train, J_list_valid])
+    x_ticks = np.arange(0, n_epochs+1, 5)
+    legends = ["training", "validation"]
+    x_label = "epoch"
+    y_label = "cost function J"
+    title = "Cost after every epoch"
+    save_title = f"SCEN{scenario} - J, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
+
+    plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
+
+        # Plot loss after each epoch
+    x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
+    y_axis = np.array([loss_list_train, loss_list_valid])
+    x_ticks = np.arange(0, n_epochs+1, 5)
+    legends = ["training", "validation"]
+    x_label = "epoch"
+    y_label = "loss"
+    title = "Loss after every epoch"
+    save_title = f"SCEN{scenario} - Loss, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
+
+    plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
+    
+
   ## SCRIPT
 
 ## Parameters
@@ -305,7 +357,7 @@ Wstar, bstar, J_list_train, loss_list_train, J_list_valid, loss_list_valid = \
     MiniBatchGD(X_train, Y_train, X_valid, Y_valid, GDparams, W, b, lbda)
 
 
-    # Accuracies of all datasets
+    # Accuracies of each dataset
 acc_train = ComputeAccuracy(X_train, y_train, Wstar, bstar)
 acc_valid = ComputeAccuracy(X_valid, y_valid, Wstar, bstar)
 acc_test = ComputeAccuracy(X_test, y_test, Wstar, bstar)
@@ -344,31 +396,58 @@ save_title = f"Loss, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDpa
 
 plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
 
-# SCENARIO 1
+
+### SCENARIO 1
+
+    # Settings parameters
+scenario = 1
 lbda = 0
 GDparams["n_epochs"] = 40
 GDparams["n_batch"] = 100
 GDparams["eta"] = 0.1
 
+script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario)
 
-# SCENARIO 2
+
+
+
+###  SCENARIO 2
+
+    # Settings parameters
+scenario = 2
 lbda = 0
 GDparams["n_epochs"] = 40
 GDparams["n_batch"] = 100
 GDparams["eta"] = 0.001
 
+script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario)
 
-# SCENARIO 3
+
+
+###  SCENARIO 3
+
+    # Settings parameters
+scenario = 3
 lbda = 0.1
 GDparams["n_epochs"] = 40
 GDparams["n_batch"] = 100
 GDparams["eta"] = 0.001
 
+script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario)
 
-# SCENARIO 4
+
+
+###  SCENARIO 4
+
+    # Settings parameters
+scenario = 4
 lbda = 1
 GDparams["n_epochs"] = 40
 GDparams["n_batch"] = 100
 GDparams["eta"] = 0.001
+
+script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario)
+
+
 
 debug = 0
