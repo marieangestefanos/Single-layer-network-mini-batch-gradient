@@ -232,39 +232,39 @@ def script(X_train, Y_train, X_valid, Y_valid, GDparams, lbda, scenario):
     acc_test = ComputeAccuracy(X_test, y_test, Wstar, bstar)
 
     print(f"SCENARIO {scenario}:\n")
-    print(f"Accuracy of the training set: {acc_train*100}%")
-    print(f"Accuracy of the validation set: {acc_valid*100}%")
-    print(f"Accuracy of the validation set: {acc_test*100}%\n")
+    print(f"Accuracy of the training set:\t {round(acc_train*100, 2)}%")
+    print(f"Accuracy of the validation set:\t {round(acc_valid*100, 2)}%")
+    print(f"Accuracy of the validation set:\t {round(acc_test*100, 2)}%\n")
 
-        # Plot learnt weight matrix
-    title = "Learnt weight matrix Wstar as class template images"
-    save_title = f"SCEN{scenario} - Wstar, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
-    montage(Wstar, title, save_title)
+    #     # Plot learnt weight matrix
+    # title = "Learnt weight matrix Wstar as class template images"
+    # save_title = f"SCEN{scenario} - Wstar, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
+    # montage(Wstar, title, save_title)
 
 
-        # Plot cost after each epoch
-    x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
-    y_axis = np.array([J_list_train, J_list_valid])
-    x_ticks = np.arange(0, n_epochs+1, 5)
-    legends = ["training", "validation"]
-    x_label = "epoch"
-    y_label = "cost function J"
-    title = "Cost after every epoch"
-    save_title = f"SCEN{scenario} - J, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
+    #     # Plot cost after each epoch
+    # x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
+    # y_axis = np.array([J_list_train, J_list_valid])
+    # x_ticks = np.arange(0, n_epochs+1, 5)
+    # legends = ["training", "validation"]
+    # x_label = "epoch"
+    # y_label = "cost function J"
+    # title = "Cost after every epoch"
+    # save_title = f"SCEN{scenario} - J, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
 
-    plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
+    # plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
 
-        # Plot loss after each epoch
-    x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
-    y_axis = np.array([loss_list_train, loss_list_valid])
-    x_ticks = np.arange(0, n_epochs+1, 5)
-    legends = ["training", "validation"]
-    x_label = "epoch"
-    y_label = "loss"
-    title = "Loss after every epoch"
-    save_title = f"SCEN{scenario} - Loss, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
+    #     # Plot loss after each epoch
+    # x_axis = np.array([np.arange(0, n_epochs), np.arange(0, n_epochs)])
+    # y_axis = np.array([loss_list_train, loss_list_valid])
+    # x_ticks = np.arange(0, n_epochs+1, 5)
+    # legends = ["training", "validation"]
+    # x_label = "epoch"
+    # y_label = "loss"
+    # title = "Loss after every epoch"
+    # save_title = f"SCEN{scenario} - Loss, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
 
-    plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
+    # plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
     
 
 
@@ -371,9 +371,9 @@ acc_train = ComputeAccuracy(X_train, y_train, Wstar, bstar)
 acc_valid = ComputeAccuracy(X_valid, y_valid, Wstar, bstar)
 acc_test = ComputeAccuracy(X_test, y_test, Wstar, bstar)
 
-print(f"\nAccuracy of the training set: {acc_train*100}%")
-print(f"Accuracy of the validation set: {acc_valid*100}%")
-print(f"Accuracy of the validation set: {acc_test*100}%\n")
+print(f"\nAccuracy of the training set:\t {round(acc_train*100, 2)}%")
+print(f"Accuracy of the validation set:\t {round(acc_valid*100, 2)}%")
+print(f"Accuracy of the validation set:\t {round(acc_test*100, 2)}%\n")
 
     # Plot learnt weight matrix
 title = "Learnt weight matrix Wstar as class template images"
@@ -404,7 +404,6 @@ title = "Loss after every epoch"
 save_title = f"Loss, lbda={lbda}, n_epochs={GDparams['n_epochs']}, n_batch={GDparams['n_batch']}, eta={GDparams['eta']}"
 
 plot(x_axis, y_axis, x_ticks, legends, title, x_label, y_label, save_title)
-
 
 ### SCENARIO 1
 
